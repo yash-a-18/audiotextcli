@@ -31,7 +31,7 @@ object AudioTextCli extends ZIOCliDefault :
     .map(wavefile => CommandType.Whisper(wavefile)) //no options or arguments
 
   val deletewav_cmd: Command[CommandType.DeleteWavFiles] = Command("deleterecordings")
-    .withHelp(HelpDoc.p("Deletes all .wav files in the current directory"))
+    .withHelp(HelpDoc.p("Deletes all record-* files in the current directory"))
     .map(_ => CommandType.DeleteWavFiles()) //no options or arguments  
 
   val audio_command: Command[CommandType] = Command("audio")
@@ -42,9 +42,9 @@ object AudioTextCli extends ZIOCliDefault :
   
   // Define val cliApp using CliApp.make
   val cliApp = CliApp.make(
-    name = "Sample Git",
+    name = "Audio to Text CLI",
     version = "1.1.0",
-    summary = text("Sample implementation of git clone"),
+    summary = text("records and uses whisper to transcribe to text"),
     command = audio_command
   ) {
         // Implement logic of CliApp

@@ -16,7 +16,7 @@ Class WavFileName : System.Management.Automation.IValidateSetValuesGenerator {
 function whisper {
     param (
         [Parameter(Mandatory)]
-        [ValidateSet("whisper", "record","deleterecordings")]
+        [ValidateSet("about","whisper", "record","deleterecordings")]
         [string]
         $command,
 
@@ -26,7 +26,10 @@ function whisper {
         $wavFile 
     )
 
-    if($command -eq "record") {
+    if($command -eq "about") {
+        & $batfile
+    }
+    elseif($command -eq "record") {
         # Handle special case for listing devices
         if ($wavFile -eq "--listDevices") {
             & $batfile record --listDevices
