@@ -10,6 +10,7 @@ object AudioTextCli extends ZIOCliDefault :
   object CommandType :
     case class Record(listAvailableAudioDevices:Boolean) extends CommandType
     case class Whisper(wavfile: String) extends CommandType
+    case class DeleteWavFiles() extends CommandType
 
   /**
    * First we define the commands of the Cli. To do that we need:
@@ -29,9 +30,13 @@ object AudioTextCli extends ZIOCliDefault :
     .withHelp(help)
     .map(wavefile => CommandType.Whisper(wavefile)) //no options or arguments
 
+  val deletewav_cmd: Command[CommandType.DeleteWavFiles] = Command("deleterecordings")
+    .withHelp(HelpDoc.p("Deletes all .wav files in the current directory"))
+    .map(_ => CommandType.DeleteWavFiles()) //no options or arguments  
+
   val audio_command: Command[CommandType] = Command("audio")
     .withHelp(help)
-    .subcommands(record_cmd , whisper_cmd)
+    .subcommands(record_cmd , whisper_cmd, deletewav_cmd)
     .map{_.asInstanceOf[CommandType]} //map to CommandType
 
   
@@ -46,11 +51,13 @@ object AudioTextCli extends ZIOCliDefault :
       case r:CommandType.Record => if(r.listAvailableAudioDevices) {AudioRecorder.listAvailableAudioDevices();printLine("Available audio devices listed.")}
         else AudioRecorder.startRecording() ; printLine("Recording completed.")
       case w:CommandType.Whisper => 
-        val result = WhisperTranscriber.transcribeAudioFile(w.wavfile)
-        println(result match {
+        val result = WhisperTranscriber.transcribeWavFile(w.wavfile)
+        printLine(result match {
           case Right(transcription) => s"Transcription: $transcription"
           case Left(error) => s"Error: $error"
         })
-        printLine(s"whispered  this file ${w.wavfile}")
+      case d:CommandType.DeleteWavFiles => 
+        val result = AudioRecorder.deleteRecordingFiles()  
+        printLine(s"deleted wav files")
 
     }

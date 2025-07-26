@@ -99,10 +99,11 @@ object WhisperTranscriber :
     }
   }
   
-  def transcribeWavFile(wavFilePath: String): Unit = {
+  def transcribeWavFile(wavFilePath: String): Either[String,String] = {
     println(s"Starting transcription of: $wavFilePath")
     
-    transcribeAudioFile(wavFilePath) match {
+    val textResult = transcribeAudioFile(wavFilePath)
+    textResult match {
       case Right(transcription) =>
         println("Transcription completed successfully!")
         println("=" * 50)
@@ -113,9 +114,11 @@ object WhisperTranscriber :
         val outputFile = File(wavFilePath).parent / (File(wavFilePath).nameWithoutExtension + "_transcription.txt")
         outputFile.write(transcription)
         println(s"Transcription saved to: ${outputFile.pathAsString}")
+        textResult
         
       case Left(error) =>
         println(s"Transcription failed: $error")
+        textResult
     }
   }
 

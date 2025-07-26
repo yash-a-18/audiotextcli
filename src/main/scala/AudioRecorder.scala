@@ -75,7 +75,7 @@ object AudioRecorder :
           case e: IOException => 
             println(s"Error writing audio file: ${e.getMessage}")
             throw e
-        }.get
+        }.get 
       }
       
       recordingFuture = Some(recordingTask)
@@ -87,7 +87,7 @@ object AudioRecorder :
       stopRecording()
       
       // Wait for the recording task to complete with a timeout
-      Await.result(recordingTask, 10.seconds)
+      Await.result(recordingTask, 1.seconds)
       
       val outputFileInfo = BFile(outputFile)
       val fileSizeMB = if (outputFileInfo.exists) {
@@ -148,6 +148,40 @@ object AudioRecorder :
           println(s"    Line: ${lineInfo.getLineClass.getSimpleName}")
         }
       }
+    }
+  }
+
+  def deleteRecordingFiles(): Either[String, Unit] = {
+    val recordingsDir = BFile(".")
+    val wavFiles = recordingsDir.glob("*.wav").toSeq
+    
+    if (wavFiles.isEmpty) {
+      return Left("No recording files found to delete.")
+    }
+    
+    wavFiles.foreach { file =>
+      try {
+        file.delete()
+        println(s"Deleted recording file: ${file.name}")
+      } catch {
+        case e: IOException => 
+          return Left(s"Failed to delete file '${file.name}': ${e.getMessage}")
+      }
+    }
+    
+    Right(())
+  }
+  def deleteRecordingFile(filename: String): Either[String, Unit] = {
+    val file = BFile(filename)
+    if (file.exists) {
+      try {
+        file.delete()
+        Right(())
+      } catch {
+        case e: IOException => Left(s"Failed to delete file '$filename': ${e.getMessage}")
+      }
+    } else {
+      Left(s"File '$filename' does not exist.")
     }
   }
   

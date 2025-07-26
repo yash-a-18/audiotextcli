@@ -2,11 +2,12 @@
 # or 
 # . .\PSCompleter.ps1
 
+$batfile = ".\target\pack\bin\audio-text-cli.bat"
 
 Class WavFileName : System.Management.Automation.IValidateSetValuesGenerator {
     [string[]] GetValidValues () {
         $wavFiles = Get-ChildItem -Path ".\" -Filter "*.wav" | Select-Object -ExpandProperty Name
-        $wavFiles = @("--listDevices") + $wavFiles
+        $wavFiles = @('--listDevices') + $wavFiles
         return $wavFiles
     }
 }    
@@ -15,7 +16,7 @@ Class WavFileName : System.Management.Automation.IValidateSetValuesGenerator {
 function whisper {
     param (
         [Parameter(Mandatory)]
-        [ValidateSet("whisper", "record")]
+        [ValidateSet("whisper", "record","deleterecordings")]
         [string]
         $command,
 
@@ -28,15 +29,20 @@ function whisper {
     if($command -eq "record") {
         # Handle special case for listing devices
         if ($wavFile -eq "--listDevices") {
-            & .\target\pack\bin\zio-console.bat record --listDevices
+            & $batfile record --listDevices
         } else 
         {
-            & .\target\pack\bin\zio-console.bat record
+            & $batfile record
         }
     }
     elseif( $command -eq "whisper") {
-        & .\target\pack\bin\zio-console.bat whisper $wavFile
-    } else {
-        Write-Error "Invalid command. Use 'whisper' or 'record'."
+        & $batfile whisper $wavFile
+    } 
+    elseif( $command -eq "deleterecordings") {
+        # Handle deletion of .wav files
+        & $batfile deleterecordings
+    }
+    else {
+        Write-Error "Invalid command. Use 'whisper' or 'record' or 'deleterecordings'."
     }
 }    

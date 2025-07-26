@@ -13,6 +13,7 @@ node_modules/
 .scala-build/
 .vscode/
 .bloop/
+project/metals.sbt
 project/project/
 project/metals/
 project/target/
