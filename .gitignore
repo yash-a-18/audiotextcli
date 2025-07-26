@@ -1,0 +1,23 @@
+# Ignore the .env file
+.env
+
+# Ignore node_modules
+node_modules/
+
+# Ignore log files
+*.log
+
+# Ignore build output
+.bsp/
+.metals/
+.scala-build/
+.vscode/
+.bloop/
+project/project/
+project/metals/
+project/target/
+target/
+
+*.wav
+*.mp3
+*.txt
