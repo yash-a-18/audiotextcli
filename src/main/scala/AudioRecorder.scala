@@ -153,36 +153,32 @@ object AudioRecorder :
 
   def deleteRecordingFiles(): Either[String, Unit] = {
     val recordingsDir = BFile(".")
-    val wavFiles = recordingsDir.glob("*.wav").toSeq
+    val wavFiles = recordingsDir.glob("recording-*").toSeq
     
     if (wavFiles.isEmpty) {
       return Left("No recording files found to delete.")
     }
     
-    wavFiles.foreach { file =>
-      try {
+    val errors = wavFiles.flatMap { file =>
+      Try {
         file.delete()
         println(s"Deleted recording file: ${file.name}")
-      } catch {
-        case e: IOException => 
-          return Left(s"Failed to delete file '${file.name}': ${e.getMessage}")
-      }
+      }.failed.toOption.map(e => s"Failed to delete file '${file.name}': ${e.getMessage}")
     }
-    
-    Right(())
+
+    if (errors.nonEmpty) Left(errors.mkString("; "))
+    else Right(())
   }
   def deleteRecordingFile(filename: String): Either[String, Unit] = {
     val file = BFile(filename)
     if (file.exists) {
-      try {
+      Try {
         file.delete()
-        Right(())
-      } catch {
-        case e: IOException => Left(s"Failed to delete file '$filename': ${e.getMessage}")
-      }
-    } else {
+      }.toEither.left.map(e => s"Failed to delete file '$filename': ${e.getMessage}")
+        .map(_ => ())
+        } else {
       Left(s"File '$filename' does not exist.")
-    }
+        }
   }
   
   private def createSafeFilename(filename: String): String = {
