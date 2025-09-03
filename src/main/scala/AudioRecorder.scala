@@ -216,6 +216,11 @@ object AudioRecorder :
   }
   
   def main(args: Array[String]): Unit = {
+    if (args.length > 0 && args(0) == "deleterecordings") {
+      deleteRecordingFiles()
+      cleanup()
+      return
+    }
     println("=== Scala CLI Audio Recorder ===")
     println()
     
