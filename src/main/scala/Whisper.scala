@@ -123,12 +123,9 @@ object WhisperTranscriber :
   }
 
   // Main method to run transcription
-  def main(args: Array[String]): Unit = 
-    if (args.length < 1) {
-      println("Usage: scala whisper.sc <path-to-wav-file>")
-      println("Example: scala whisper.sc recording-2025-07-24_21-53-23.wav")
-      sys.exit(1)
-    }
-  
+  def main(args: Array[String]): Unit =   
+    if args.length < 1 then
+      println("Usage: sbt \"runMain WhisperTranscriber <wav-file-path>\"")
+      System.exit(1)
     val wavFilePath = args(0)
     WhisperTranscriber.transcribeWavFile(wavFilePath)
